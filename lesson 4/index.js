@@ -38,8 +38,11 @@ app.post('/api/tasks/nextIndex', (req, res) => {
 app.use((error, _, res, next) => {
     if (error.name === 'An error has occurred') {
         res.status(400).send({message: error.message})
-    } else res.status(500).send('Internal Server Error')
-    console.log(error.message);
+    }
+    if (error.name === 'TypeError') {
+        res.status(500).send('Internal Server Error')
+    }
+    console.log(error.name);
 });
 
 app.listen(PORT, () => {

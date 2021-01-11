@@ -7,6 +7,6 @@ module.exports = [
             // но сервер не сможет корректно работать и будет ошибка 500
             target: 2,
         },
-        value: 1,
+        value: 'Internal Server Error',
     }
 ]
