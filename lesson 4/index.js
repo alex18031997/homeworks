@@ -37,12 +37,12 @@ app.post('/api/tasks/nextIndex', (req, res) => {
 
 app.use((error, _, res, next) => {
     if (error.name === 'An error has occurred') {
-        res.status(400).send({message: error.message})
+        res.status(400).send({result: 'ERROR 400 - Bad Request'})
     }
     if (error.name === 'TypeError') {
-        res.status(500).send('Internal Server Error')
+        const result = 'ERROR 500 - Internal Server Error'
+        res.status(500).send({result});
     }
-    console.log(error.name);
 });
 
 app.listen(PORT, () => {
