@@ -215,11 +215,15 @@ clearBtn.addEventListener('click', () => {
 })
 checkResult();
 
-// логика для кнопки выходя
+// логика для кнопки выхода
 
 const logout = document.querySelector('.logout').addEventListener('click', ()=>{
     fetch('http://localhost:3000/logout', {
         method: 'POST'
-    })
-    location.reload();
+    }).then(data => data)
+        .then(data => {
+            if(data.status === 200){
+                location.reload();
+            }
+        })
 });

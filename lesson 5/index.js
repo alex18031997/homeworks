@@ -24,7 +24,7 @@ app.post('/login', ((req, res) => {
     const user = JSON.parse(login);
    if(req.body.login === user.login && req.body.pass === user.pass){
         res.cookie('isAuth', 'yes', {expires: new Date(Date.now() + 9000000)});
-       res.status(200).send({ message: 'authorization successful' });
+       res.status(200).send({ message: 'successful' });
     }
        res.status(400).send({ message: 'Invalid login or password' });
 }));
@@ -32,6 +32,7 @@ app.post('/login', ((req, res) => {
 app.post('/logout', ((req, res) => {
     if(req.cookies.isAuth === 'yes'){
         res.clearCookie("isAuth");
+        res.status(200).send({ message: 'successful' });
         res.redirect('/');
     }
 }))
