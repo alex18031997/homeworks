@@ -4,19 +4,33 @@ const jsonParser = express.json();
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const app = express();
-const mongoose = require('./models/db');
-const async = require('async');
 const User = require('./models/users').User;
 const Result = require('./models/result').Result;
-
-
+const asyncHandler = require('express-async-handler');
+const session = require('express-session');
+const sessionParams = {
+    secret: 'keyboard cat',
+    cookie: {}
+}
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'client')));
-app.use(express.urlencoded({extended: true}))
+app.use(express.urlencoded({extended: true}));
+app.use(session(sessionParams));
+
+const isUserAuth = (req) => {
+    return req.session.userId;
+}
+
+app.use((req, res, next) => {
+    if (isUserAuth(req)) {
+        req.userAuth = true;
+    }
+    return next();
+})
 
 app.get('/', (req, res) => {
-    if(req.cookies.isAuth === 'yes') {
+    if (req.userAuth) {
         res.sendFile(__dirname + '/client/game.html');
     } else {
         res.sendFile(__dirname + '/client/login.html');
@@ -24,68 +38,67 @@ app.get('/', (req, res) => {
 });
 
 app.post('/login', ((req, res) => {
-    async.waterfall([
-        (callback) => {
-            User.findOne({username: req.body.login}, callback);
-        },
-        (user, callback) => {
-            if (user.username === req.body.login && user.password === req.body.pass) {
-                res.cookie('isAuth', 'yes', {expires: new Date(Date.now() + 9000000)});
-                res.status(200).send({ message: 'successful' })
-                callback(null, user);
-
+    const login = req.body.login;
+    const password = req.body.pass;
+    User.findOne({login: login}, (err, user) => {
+        if (user) {
+            if (user.checkPassword(password)) {
+                req.session.userId = user._id;
+                res.status(200).send({message: 'successful'})
             } else {
-                res.status(400).send({ message: 'Invalid login or password' });
+                res.status(403).send({message: 'Invalid password'});
             }
-        },
-    ], function (err, user){
-
+        } else {
+            res.status(403).send({message: 'Invalid login or password'});
+        }
     })
 }));
 
 app.post('/logout', ((req, res) => {
-    if(req.cookies.isAuth === 'yes'){
-        res.clearCookie("isAuth");
-        res.status(200).send({ message: 'successful' });
-        res.redirect('/');
-    }
+    req.session.destroy();
+    res.redirect('/');
 }));
 
 app.get('/showreg', ((req, res) => {
-    res.sendFile(__dirname + '/client/reg.html');
+    if (req.userAuth) {
+        res.sendFile(__dirname + '/client/404.html');
+    } else {
+        res.sendFile(__dirname + '/client/reg.html');
+    }
+}));
 
-}))
+app.post('/reg', asyncHandler((req, res, next) => {
+    const user = require('./models/valid').reg(req.body.name, req.body.login, req.body.pass, req.body.PassСon, req.body.DataReg);
+    user.save((err, callback) => {
+        if (err) {
+            res.status(400).send({message: 'this login is busy'})
+        } else {
+            req.session.userId = user._id;
+            res.status(200).send({message: 'successful'});
+        }
 
-app.post('/reg', ((req,res) => {
-    require('./models/valid').reg(req.body.login, req.body.pass, req.body.PassСon, req.body.DataReg);
-    res.cookie('isAuth', 'yes', {expires: new Date(Date.now() + 9000000)});
-    res.status(200).send({ message: 'successful' });
+    });
+}));
 
+app.post('/getUserName', asyncHandler((req, res, next) => {
+    const id = req.session.userId;
+    User.findOne({_id: id}, (err, user) => {
+        res.status(200).send({message: user});
+    });
 }));
 
 app.get('/result', (req, res) => {
-    async.waterfall([
-    (callback) => {
-        Result.find({}, callback).sort({ result: -1 });
-    },
-        (result, callback) => {
-            if(result.length < 10){
-                res.send(result);
-            } else {
-               res.send(result.slice(0, 10));
-            };
+    Result.find({}, (err, result) => {
+        if (result.length < 10) {
+            res.send(result);
+        } else {
+            res.send(result.slice(0, 10));
         }
-    ], (err, callback) => {
-        if(err) {
-            res.status(400);
-        }
-
-    })
-
+    }).sort({result: -1});
 });
 
 app.post("/form", (req, res) => {
-    require('./models/valid').form(req.body[0].name, req.body[0].result);
+    require('./models/valid').result(req.body[0].name, req.body[0].result);
 });
 
 
@@ -93,11 +106,8 @@ app.get('*', (req, res) => {
     res.sendFile(__dirname + '/client/404.html');
 });
 
-app.use((error, _, res, next) => {
-    if (error.name === 'An error has occurred') {
-        res.send({result: 'этот логин уже занят'});
-        console.log('test');
-    }
+app.use((err, req, res, next) => {
+    console.log('err', err);
 });
 
 

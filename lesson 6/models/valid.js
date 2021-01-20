@@ -1,12 +1,11 @@
 const Result = require('./result').Result;
-const async = require('async');
 const User = require('./users').User;
 const makeError = require('../error');
 
 
 module.exports = {
-    form: (name, result) => {
-        const NewResult = new Result ({
+    result: (name, result) => {
+        const NewResult = new Result({
             name: name,
             result: result,
         });
@@ -15,18 +14,14 @@ module.exports = {
 
         });
     },
-    reg: (username, password, PassСon, DataReg) => {
-            const user = new User ({
-                username: username,
-                password: password,
-                PassСon: PassСon,
-                DataReg: DataReg
-            });
-
-            user.save(function (err) {
-                if (err) {
-                    throw err;
-                }
-            });
-        }
-}
+    reg: (name, login, password, PassСon, DataReg,) => {
+        const user = new User({
+            name: name,
+            login: login,
+            password: password,
+            PassСon: PassСon,
+            DataReg: DataReg
+        });
+        return user;
+    }
+};

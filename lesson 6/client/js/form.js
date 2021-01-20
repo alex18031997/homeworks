@@ -23,7 +23,7 @@ btnDefault.addEventListener('click', (e) => {
         body: JSON.stringify(object)
     }) .then(data => data)
         .then(data => {
-            if(data.status === 400){
+            if(data.status === 403){
                 error.classList.remove('hide');
             } else if(data.status === 200){
                 location.reload();

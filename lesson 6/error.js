@@ -1,6 +1,6 @@
 module.exports = (message) => {
-    const error = new Error();
-    error.name = 'An error has occurred';
-    error.message = message;
-    return error;
+    const err = new Error();
+    err.name = 'An error has occurred';
+    err.message = message;
+    return err;
 }

@@ -4,6 +4,7 @@ let countPoints = 0; // переменная которая будет счет�
 let leftTime = 0; // переменная которая будет счетчиком time
 const modal = document.querySelector('.modal'); // получаем модальное окно
 let localObj = []; // пустой объект куда будет передаваться данные для local storage
+const header = document.querySelector('.header h1');
 
 
 // функция которая возвращат случайное число в заданом диапазоне
@@ -184,6 +185,7 @@ const checkResult = () => {
             return response.json();
         })
         .then((data) => {
+            console.log(data);
             if (data.length === 0) {
                 tableResult.innerHTML = 'Здесь пока нет записей'
             } else {
@@ -216,13 +218,21 @@ checkResult();
 
 // логика для кнопки выхода
 
-const logout = document.querySelector('.logout').addEventListener('click', ()=>{
+const logout = document.querySelector('.logout').addEventListener('click', () => {
     fetch('http://localhost:3000/logout', {
         method: 'POST'
     }).then(data => data)
         .then(data => {
-            if(data.status === 200){
+            if (data.status === 200) {
                 location.reload();
             }
         })
 });
+
+
+fetch('http://localhost:3000/getUserName', {
+    method: 'POST'
+}).then(data => data.json())
+    .then(data => {
+        header.innerHTML = `Доброе пожаловать ${data.message.name} !`;
+    })

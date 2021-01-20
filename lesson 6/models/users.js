@@ -1,23 +1,44 @@
+const crypto = require('crypto');
 const mongoose = require('../models/db'),
     Schema = mongoose.Schema;
 
 const schema = new Schema({
-    username: {
+    login: {
         type: String,
         unique: true,
         required: true
     },
-    password: {
+    hashedPassword: {
         type: String,
         required: true
     },
-    PassСon: {
+    salt: {
         type: String,
         required: true
     },
-    DataReg: {
-        type: String
-    }
+    created: {
+        type: Date,
+        default: Date.now
+    },
+    name: {
+        type: String,
+        required: true
+    },
 });
+schema.methods.encryptPassword = function (password) {
+    return crypto.createHmac("sha1", this.salt).update(password).digest('hex');
+};
 
+schema.virtual('password')
+    .set(function (password) {
+        this._plainPassword = password;
+        this.salt = Math.random();
+        this.hashedPassword = this.encryptPassword(password);
+    })
+    .get(function () {
+        return this._plainPassword
+    });
+schema.methods.checkPassword = function (password) {
+    return this.encryptPassword(password) === this.hashedPassword;
+};
 exports.User = mongoose.model('User', schema);
