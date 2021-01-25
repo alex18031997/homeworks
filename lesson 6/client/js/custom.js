@@ -5,6 +5,18 @@ let leftTime = 0; // переменная которая будет счетчи
 const modal = document.querySelector('.modal'); // получаем модальное окно
 let localObj = []; // пустой объект куда будет передаваться данные для local storage
 const header = document.querySelector('.header h1');
+const admin = document.querySelector('#admin');
+let username;
+
+
+fetch('http://localhost:3000/getUserName', {
+    method: 'POST'
+}).then(data => data.json())
+    .then(data => {
+        if (data.message.role === 'admin') admin.classList.add('btn');
+        header.innerHTML = `Добро пожаловать ${data.message.name} !`;
+        username = data.message.name;
+    });
 
 
 // функция которая возвращат случайное число в заданом диапазоне
@@ -140,9 +152,9 @@ document.querySelector('.resCnc').addEventListener('click', () => {
 //функция которая отправляет данные на сервер
 
 const setToBackEnd = () => {
-    let myInput = document.querySelector('.myInput');
+
     let b = {
-        name: myInput.value,
+        name: username,
         result: countPoints
     }
     localObj.push(b);
@@ -154,22 +166,16 @@ const setToBackEnd = () => {
         body: JSON.stringify(localObj)
     })
     modal.style.display = 'none';
-    myInput.value = '';
     localObj = [];
 }
 
 // функция получает данные с input и сетит их на сервер
 
 document.querySelector('.resSave').addEventListener('click', () => {
-    let myInput = document.querySelector('.myInput');
-    if (myInput.value.length < 3) {
-        document.querySelector('.checkLength').classList.remove('hide');
-    } else {
-        setToBackEnd();
-        setRandomColor();
-        changePauseOnStart();
-        setTimeout(checkResult, 500);
-    }
+    setToBackEnd();
+    setRandomColor();
+    changePauseOnStart();
+    setTimeout(checkResult, 500);
 })
 
 // сохраняем данные на сервер
@@ -185,7 +191,6 @@ const checkResult = () => {
             return response.json();
         })
         .then((data) => {
-            console.log(data);
             if (data.length === 0) {
                 tableResult.innerHTML = 'Здесь пока нет записей'
             } else {
@@ -229,10 +234,3 @@ const logout = document.querySelector('.logout').addEventListener('click', () =>
         })
 });
 
-
-fetch('http://localhost:3000/getUserName', {
-    method: 'POST'
-}).then(data => data.json())
-    .then(data => {
-        header.innerHTML = `Доброе пожаловать ${data.message.name} !`;
-    })

@@ -1,7 +1,5 @@
 const Result = require('./result').Result;
 const User = require('./users').User;
-const makeError = require('../error');
-
 
 module.exports = {
     result: (name, result) => {
@@ -14,13 +12,17 @@ module.exports = {
 
         });
     },
-    reg: (name, login, password, PassСon, DataReg,) => {
+    reg: (name, login, password, DataReg, userIp) => {
         const user = new User({
-            name: name,
             login: login,
+            name: name,
+            userIp: userIp,
+            DataReg: DataReg,
             password: password,
-            PassСon: PassСon,
-            DataReg: DataReg
+            role: 'gamer',
+            gameCount: 0,
+            topScore: 0
+
         });
         return user;
     }

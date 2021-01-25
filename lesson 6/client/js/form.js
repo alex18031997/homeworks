@@ -6,7 +6,6 @@ const error = document.querySelector('#error');
 const reg = document.querySelector('#reg');
 
 
-
 form.addEventListener('click', (e) => {
     e.preventDefault();
 });
@@ -21,11 +20,11 @@ btnDefault.addEventListener('click', (e) => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(object)
-    }) .then(data => data)
+    }).then(data => data)
         .then(data => {
-            if(data.status === 403){
+            if (data.status === 403) {
                 error.classList.remove('hide');
-            } else if(data.status === 200){
+            } else if (data.status === 200) {
                 location.reload();
             }
         })

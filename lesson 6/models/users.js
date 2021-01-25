@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+
 const mongoose = require('../models/db'),
     Schema = mongoose.Schema;
 
@@ -17,13 +18,29 @@ const schema = new Schema({
         required: true
     },
     created: {
-        type: Date,
-        default: Date.now
+        type: String,
+        default: () => {
+            let data = new Date();
+            let thisDate = `${data.getDate()}.${data.getMonth() + 1}.${data.getFullYear()}`;
+            return thisDate;
+        }
     },
     name: {
         type: String,
         required: true
     },
+    userIp: {
+        type: String,
+    },
+    role: {
+        type: String,
+    },
+    gameCount: {
+        type: Number,
+    },
+    topScore: {
+        type: Number,
+    }
 });
 schema.methods.encryptPassword = function (password) {
     return crypto.createHmac("sha1", this.salt).update(password).digest('hex');
