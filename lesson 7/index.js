@@ -122,7 +122,7 @@ app.post("/form", (req, res) => {
     );
 });
 
-app.get('/adminpanel', ((req, res) => {
+app.get('/admin', ((req, res) => {
     const id = req.session.userId;
     User.findOne({_id: id}, (err, user) => {
         if (req.userAuth) {
@@ -144,7 +144,7 @@ app.get('*', (req, res) => {
     res.sendFile(__dirname + '/client/404.html');
 });
 
-app.post('/admin', ((req, res) => {
+app.post('/adminpanel', ((req, res) => {
     const sortBy = req.body;
     User.find({}, (err, user) => {
         const users = user.slice(0, 3);

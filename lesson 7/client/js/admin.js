@@ -10,7 +10,7 @@ let pageCount = 1;
 pageState.textContent = pageCount;
 
 
-fetch('http://localhost:3000/adminpanel', {
+fetch('http://localhost:3000/admin', {
     method: 'POST'
 });
 
@@ -30,7 +30,7 @@ const renderTable = (data) => {
 
 const getUsers = () => {
     const sorter = {name: 1};
-    fetch('http://localhost:3000/admin', {
+    fetch('http://localhost:3000/adminpanel', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -49,7 +49,7 @@ forSort.addEventListener('click', (e) => {
     count++;
     if (count === 1) count = -1;
     let localObj = {[sorter]: count};
-    fetch('http://localhost:3000/admin', {
+    fetch('http://localhost:3000/adminpanel', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
